@@ -1,0 +1,32 @@
+artifacts = ["/app/report.json"]
+
+[task]
+name = "dynamo/log-report"
+description = "Parse an Apache-style access log into a small JSON summary report."
+
+[metadata]
+category = "data_processing_and_etl"
+subcategory = "text_processing"
+task_objective = ["transform", "generate"]
+artifact_type = ["text_or_log_file", "generated_output_artifact"]
+expert_time_estimate_hours = 0.3
+model_tested = "GPT-5.4"
+agent_tested = "Terminus-2"
+difficulty_explanation = "A short access log has to be parsed with the standard library and reduced to three summary values. The parsing is routine; the care is in taking the client IP from the first field, pulling the path out of the quoted request line without the method or HTTP version, and skipping blank lines so the request count is right."
+solution_explanation = "Read /app/access.log line by line, skip blank lines, and count the lines for total_requests. Collect the first whitespace-separated field of each line into a set for unique_ips. Extract the path from the quoted request line, tally the paths, and take the most common one for top_path. Write the three values as a single JSON object to /app/report.json."
+verification_explanation = "The verifier parses /app/report.json and asserts the produced values, not just that the file exists. It checks that the file is valid JSON, that the key set is exactly total_requests, unique_ips and top_path, and that the values equal 6, 3 and /index.html for the access.log baked into the image. Each test names the instruction success criterion it covers, so an empty or placeholder report fails and a no-op agent scores 0."
+
+[verifier]
+timeout_sec = 120.0
+
+[agent]
+timeout_sec = 120.0
+
+[environment]
+build_timeout_sec = 600.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 10240
+gpus = 0
+allow_internet = true
+mcp_servers = []
