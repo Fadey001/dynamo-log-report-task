@@ -12,9 +12,9 @@ artifact_type = ["text_or_log_file", "generated_output_artifact"]
 expert_time_estimate_hours = 0.3
 model_tested = "GPT-5.4"
 agent_tested = "Terminus-2"
-difficulty_explanation = "A short access log has to be parsed with the standard library and reduced to three summary values. The parsing is routine; the care is in taking the client IP from the first field, pulling the path out of the quoted request line without the method or HTTP version, and skipping blank lines so the request count is right."
-solution_explanation = "Read /app/access.log line by line, skip blank lines, and count the lines for total_requests. Collect the first whitespace-separated field of each line into a set for unique_ips. Extract the path from the quoted request line, tally the paths, and take the most common one for top_path. Write the three values as a single JSON object to /app/report.json."
-verification_explanation = "The verifier parses /app/report.json and asserts the produced values, not just that the file exists. It checks that the file is valid JSON, that the key set is exactly total_requests, unique_ips and top_path, and that the values equal 6, 3 and /index.html for the access.log baked into the image. Each test names the instruction success criterion it covers, so an empty or placeholder report fails and a no-op agent scores 0."
+difficulty_explanation = "The log is short and the parsing only needs the standard library. The care is in three small details. The client IP is the first field on a line. The path sits inside the quoted request line and has to be taken without the method or the HTTP version. Blank lines have to be skipped so the request count comes out right."
+solution_explanation = "Read /app/access.log one line at a time and skip the blank lines. Count the lines that remain to get total_requests. Take the first whitespace separated field of each line and collect those in a set to get unique_ips. Pull the path out of the quoted request line, tally the paths, and take the most common one for top_path. Write the three values as one JSON object to /app/report.json."
+verification_explanation = "The verifier parses /app/report.json and checks the values the agent produced. It confirms the file is valid JSON. It confirms the key set is exactly total_requests, unique_ips and top_path. It then checks the values against the log baked into the image, which gives 6, 3 and /index.html. Each test names the success criterion it covers. An empty or placeholder report fails, so a no-op agent scores 0."
 
 [verifier]
 timeout_sec = 120.0
